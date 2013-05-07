@@ -195,7 +195,8 @@ from urlparse import urlparse, urldefrag
 from openid import fetchers
 
 from openid.consumer.discover import discover, OpenIDServiceEndpoint, \
-     DiscoveryFailure, OPENID_1_0_TYPE, OPENID_1_1_TYPE, OPENID_2_0_TYPE
+     DiscoveryFailure, OPENID_1_0_TYPE, OPENID_1_1_TYPE, OPENID_2_0_TYPE, \
+     OPENID_IDP_2_0_TYPE
 from openid.message import Message, OPENID_NS, OPENID2_NS, OPENID1_NS, \
      IDENTIFIER_SELECT, no_default, BARE_NS
 from openid import cryptutil
@@ -931,6 +932,9 @@ class GenericConsumer(object):
         if not endpoint:
             logging.info('No pre-discovered information supplied.')
             endpoint = self._discoverAndVerify(to_match.claimed_id, [to_match])
+        elif endpoint.isOPIdentifier():
+            logging.info('Pre-discovered information based on OP-ID; need to rediscover.')
+            endpoint = self._discoverAndVerify(claimed_id, [to_match])
         else:
             # The claimed ID matches, so we use the endpoint that we
             # discovered in initiation. This should be the most common
